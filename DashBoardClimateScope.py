@@ -648,8 +648,19 @@ def filter_data(countries, start, end, metric, normalize):
         if mx > mn:
             d = d.assign(**{metric: (d[metric] - mn) / (mx - mn)})
     return d
-
-filtered = filter_data(tuple(countries), date_range[0], date_range[1], metric, normalize)
+# Remove the first filter_data call and only use the checked version
+if len(date_range) == 2:
+    filtered = filter_data(
+        tuple(countries), 
+        date_range[0], 
+        date_range[1], 
+        metric, 
+        normalize
+    )
+else:
+    # Handle the case when date range is incomplete
+    st.warning("Please select both start and end dates")
+    filtered = df  # or use default dates
 
 # =====================================================
 # ENHANCED KPI SECTION
@@ -1554,4 +1565,5 @@ else:
         data=filtered.to_csv(index=False).encode("utf-8"),
         file_name="ClimateScope_Filtered_Data.csv",
         mime="text/csv"
+
     )
